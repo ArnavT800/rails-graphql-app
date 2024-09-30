@@ -10,12 +10,49 @@ module Types
       context.schema.object_from_id(id, context)
     end
 
-    field :nodes, [Types::NodeType, null: true], null: true, description: "Fetches a list of objects given a list of IDs." do
-      argument :ids, [ID], required: true, description: "IDs of the objects."
+    field :nodes, [ Types::NodeType, null: true ], null: true, description: "Fetches a list of objects given a list of IDs." do
+      argument :ids, [ ID ], required: true, description: "IDs of the objects."
     end
 
     def nodes(ids:)
       ids.map { |id| context.schema.object_from_id(id, context) }
+    end
+
+    field :articles, [ Types::ArticleType ], null: true do
+    end
+
+
+    def articles
+      Article.all
+    end
+    field :article, [ Types::ArticleType ], null: false do
+      argument :id, [ ID ], required: false
+    end
+
+    def article(id: nil)
+      id ? Article.where(id: id) : Article.all
+    end
+
+    field :article_by_title, [ Types::ArticleType ], null: false do
+      argument :title, String, required: true
+    end
+    def article_by_title(title:)
+      Article.where(title: title)
+    end
+
+    fields :articles_by_user_id, [ Types::ArticleType ], null: false do
+      argument :user_id, Integer, required: true
+    end
+
+    def articles_by_user_id(user_id:)
+      Article.where(user_id: user_id)
+    end
+
+    fields :comments_by_article_id, [ Types::CommentType ], null: false do
+      argument :article_id, Integer, required: true
+    end
+    def comments_by_article_id(article_id:)
+      Comment.where(article_id: article_id)
     end
 
     # Add root-level fields here.
